@@ -26,8 +26,8 @@ public class GroupController {
     public GroupEntity updateGroup(@RequestBody GroupEntity groupEntity){
         return service.updateGroup(groupEntity);
     }
-    @DeleteMapping("/{id}")
-    public void deleteGroup(@PathVariable("id") int id){
+    @DeleteMapping("/{group_id}")
+    public void deleteGroup(@PathVariable("group_id") int id){
         service.deleteGroup(id);
     }
 }
