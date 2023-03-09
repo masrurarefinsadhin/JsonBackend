@@ -1,13 +1,19 @@
 package com.jsonbook.Json.Book.entity;
 
 
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
+import java.awt.*;
 
 @Entity
 @Table(name = "request")
 
 
+
+
 public class RequestEntity {
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,32 +22,60 @@ public class RequestEntity {
     @Column(name = "requestName")
     private String name;
 
+    @Lob
+    @Type(type = "org.hibernate.type.TextType")
     @Column(name = "requestURL")
     private String url;
 
+    @Lob
+    @Type(type = "org.hibernate.type.TextType")
     @Column(name = "requestHeader")
     private String header;
+
+    @Lob
+    @Type(type = "org.hibernate.type.TextType")
     @Column(name = "requestBody")
     private String reqBody;
+
+    @Lob
+    @Type(type = "org.hibernate.type.TextType")
     @Column(name = "resposeBody")
     private String resBody;
+
+
+    @ManyToOne
+    @JoinColumn(name="group_id", nullable= true)
+    private GroupEntity groupEntity;
+
+
+
 
     public RequestEntity(){
 
     }
 
 
-    public RequestEntity(long id, String name, String url, String header, String reqBody, String resBody) {
+    public RequestEntity(long id, String name, String url, String header, String reqBody, String resBody, GroupEntity groupEntity) {
         this.id = id;
         this.name = name;
         this.url = url;
         this.header = header;
         this.reqBody = reqBody;
         this.resBody = resBody;
+        this.groupEntity = groupEntity;
+
     }
 
     public long getId() {
         return id;
+    }
+
+    public GroupEntity getGroupEntity() {
+        return groupEntity;
+    }
+
+    public void setGroupEntity(GroupEntity groupEntity) {
+        this.groupEntity = groupEntity;
     }
 
     public void setId(long id) {

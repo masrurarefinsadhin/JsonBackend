@@ -1,6 +1,8 @@
 package com.jsonbook.Json.Book.entity;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name="group_list")
@@ -16,6 +18,8 @@ public class GroupEntity {
         this.groupId = groupId;
         this.groupName = groupName;
     }
+
+
     public GroupEntity(){
     }
     public int getGroupId() {
