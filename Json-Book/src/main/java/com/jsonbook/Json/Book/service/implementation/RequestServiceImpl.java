@@ -36,7 +36,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public void deleteRequest(Long id) {
+    public void deleteRequest(long id) {
         requestRepository.deleteById(id);
     }
 

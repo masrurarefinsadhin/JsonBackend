@@ -1,7 +1,11 @@
 package com.jsonbook.Json.Book.entity;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Entity
@@ -14,11 +18,13 @@ public class GroupEntity {
     @Column(name="group_name")
     private String groupName;
 
+   @OneToMany(mappedBy = "groupEntity", cascade = CascadeType.ALL, orphanRemoval = true)
+   private List<RequestEntity> requests;
+
     public GroupEntity(int groupId, String groupName) {
         this.groupId = groupId;
         this.groupName = groupName;
     }
-
 
     public GroupEntity(){
     }
@@ -37,6 +43,5 @@ public class GroupEntity {
     public void setGroupName(String groupName) {
         this.groupName = groupName;
     }
-
 
 }
