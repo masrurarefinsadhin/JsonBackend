@@ -1,6 +1,8 @@
 package com.jsonbook.Json.Book.entity;
 
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -8,13 +10,7 @@ import java.awt.*;
 
 @Entity
 @Table(name = "request")
-
-
-
-
 public class RequestEntity {
-
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="requestId")
@@ -42,18 +38,12 @@ public class RequestEntity {
     @Column(name = "resposeBody")
     private String resBody;
 
-
     @ManyToOne
     @JoinColumn(name="group_id", nullable= true)
     private GroupEntity groupEntity;
 
-
-
-
     public RequestEntity(){
-
     }
-
 
     public RequestEntity(long id, String name, String url, String header, String reqBody, String resBody, GroupEntity groupEntity) {
         this.id = id;
@@ -63,7 +53,6 @@ public class RequestEntity {
         this.reqBody = reqBody;
         this.resBody = resBody;
         this.groupEntity = groupEntity;
-
     }
 
     public long getId() {

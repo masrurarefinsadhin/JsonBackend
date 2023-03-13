@@ -10,7 +10,7 @@ public interface RequestService {
 
     RequestEntity saveRequest(RequestEntity requestEntity);
     RequestEntity updateRequest(RequestEntity requestEntity);
-    void deleteRequest(Long id);
+    void deleteRequest(long id);
 
     List<RequestEntity> findRequestById(long groupId);
 }
