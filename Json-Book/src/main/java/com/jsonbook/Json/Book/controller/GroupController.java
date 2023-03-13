@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = {"http://localhost:4200","http://localhost:46543"} )
 @RestController
 @RequestMapping("/group_list")
 public class GroupController {
@@ -27,7 +27,7 @@ public class GroupController {
     public GroupEntity updateGroup(@RequestBody GroupEntity groupEntity){
         return service.updateGroup(groupEntity);
     }
-    @DeleteMapping("delete/{group_id}")
+    @DeleteMapping("/delete/{group_id}")
     public void deleteGroup(@PathVariable("group_id") long id){
         service.deleteGroup(id);
     }

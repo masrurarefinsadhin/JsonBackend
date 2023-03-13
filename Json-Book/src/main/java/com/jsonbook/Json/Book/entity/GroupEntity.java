@@ -10,7 +10,7 @@ public class GroupEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "group_id")
-    private int groupId;
+    private long groupId;
     @Column(name="group_name")
     private String groupName;
 
