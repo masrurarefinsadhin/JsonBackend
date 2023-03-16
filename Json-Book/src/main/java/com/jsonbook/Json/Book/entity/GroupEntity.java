@@ -3,6 +3,8 @@ package com.jsonbook.Json.Book.entity;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import org.hibernate.annotations.Type;
+
 
 @Entity
 @Table(name="group_list")
@@ -13,6 +15,12 @@ public class GroupEntity {
     private long groupId;
     @Column(name="group_name")
     private String groupName;
+
+    // a group has many requests
+    @OneToMany(mappedBy = "groupEntity", cascade = CascadeType.ALL)
+    private List<RequestEntity> requestEntities;
+
+
 
     public GroupEntity(int groupId, String groupName) {
         this.groupId = groupId;

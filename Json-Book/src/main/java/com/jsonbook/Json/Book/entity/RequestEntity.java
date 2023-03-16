@@ -5,15 +5,12 @@ import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.awt.*;
+import java.util.List;
 
 @Entity
 @Table(name = "request")
 
-
-
-
 public class RequestEntity {
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,18 +39,19 @@ public class RequestEntity {
     @Column(name = "resposeBody")
     private String resBody;
 
-
+//    A request belongs to a Group
     @ManyToOne
     @JoinColumn(name="group_id", nullable= true)
     private GroupEntity groupEntity;
 
-
+    // Again, A request have many responses
+    @OneToMany(mappedBy = "requestEntity", cascade = CascadeType.ALL)
+    private List<ResponsesEntity> responsesEntities;
 
 
     public RequestEntity(){
 
     }
-
 
     public RequestEntity(long id, String name, String url, String header, String reqBody, String resBody, GroupEntity groupEntity) {
         this.id = id;
