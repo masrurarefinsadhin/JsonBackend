@@ -7,6 +7,8 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.hibernate.annotations.Type;
+
 
 @Entity
 @Table(name="group_list")
@@ -26,6 +28,7 @@ public class GroupEntity {
         this.groupName = groupName;
     }
 
+
     public GroupEntity(){
     }
     public long getGroupId() {
@@ -43,5 +46,6 @@ public class GroupEntity {
     public void setGroupName(String groupName) {
         this.groupName = groupName;
     }
+
 
 }
