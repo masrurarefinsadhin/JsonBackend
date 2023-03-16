@@ -1,7 +1,5 @@
 package com.jsonbook.Json.Book.controller;
 
-import com.jsonbook.Json.Book.entity.GroupEntity;
-import com.jsonbook.Json.Book.entity.RequestEntity;
 import com.jsonbook.Json.Book.service.ResponsesService;
 import com.jsonbook.Json.Book.entity.ResponsesEntity;
 import org.springframework.web.bind.annotation.*;
@@ -31,4 +29,5 @@ public class ResponsesController {
     public ResponsesEntity updateResponses(@RequestBody ResponsesEntity responsesEntity){
         return responsesService.updateResponses(responsesEntity);
     }
+
 }

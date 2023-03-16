@@ -37,12 +37,12 @@ public class ResponsesEntity {
     private Instant respondedAt;
 
     @Column(name= "time_in_mils")
-    private Integer timeInMils;
+    private long timeInMils;
 
     // foreign key mapping: a response belongs to a request
     @ManyToOne //(cascade = CascadeType.ALL)
     @JoinColumn(name="requestId", nullable= true)
-    private RequestEntity requestEntity;
+    private Requests requests;
 
 //    @JsonProperty("requestID") private void unpackNested(Integer requestID) {
 //        this.requestEntity = new RequestEntity();
@@ -54,14 +54,14 @@ public class ResponsesEntity {
     }
 
     // constructor with parameters
-    public ResponsesEntity(long responsesId, String responseStatus, String responseBody, Instant requestedAt, Instant respondedAt, Integer timeInMils, RequestEntity requestEntity) {
+    public ResponsesEntity(Long responsesId, String responseStatus, String responseBody, Instant requestedAt, Instant respondedAt, long timeInMils, Requests requests) {
         this.responsesId = responsesId;
         this.responseStatus = responseStatus;
         this.responseBody = responseBody;
         this.requestedAt = requestedAt;
         this.respondedAt = respondedAt;
         this.timeInMils = timeInMils;
-        this.requestEntity = requestEntity;
+        this.requests = requests;
     }
 
 
@@ -105,7 +105,7 @@ public class ResponsesEntity {
         this.respondedAt = respondedAt;
     }
 
-    public Integer getTimeInMils() {
+    public long getTimeInMils() {
         return timeInMils;
     }
 
@@ -113,11 +113,11 @@ public class ResponsesEntity {
         this.timeInMils = timeInMils;
     }
 
-    public RequestEntity getRequestEntity() {
-        return requestEntity;
+    public Requests getRequestEntity() {
+        return requests;
     }
 
-    public void setRequestEntity(RequestEntity requestEntity) {
-        this.requestEntity = requestEntity;
+    public void setRequestEntity(Requests requests) {
+        this.requests = requests;
     }
 }

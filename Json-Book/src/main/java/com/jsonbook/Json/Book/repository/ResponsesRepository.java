@@ -1,6 +1,5 @@
 package com.jsonbook.Json.Book.repository;
 
-import com.jsonbook.Json.Book.entity.RequestEntity;
 import com.jsonbook.Json.Book.entity.ResponsesEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
