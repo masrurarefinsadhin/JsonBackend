@@ -40,10 +40,10 @@ public class ResponsesEntity {
     private Integer timeInMils;
 
     // foreign key mapping: a response belongs to a request
+    //
     @ManyToOne //(cascade = CascadeType.ALL)
     @JoinColumn(name="requestId", nullable= true)
     private RequestEntity requestEntity;
-
 //    @JsonProperty("requestID") private void unpackNested(Integer requestID) {
 //        this.requestEntity = new RequestEntity();
 //        requestEntity.setId(requestID);

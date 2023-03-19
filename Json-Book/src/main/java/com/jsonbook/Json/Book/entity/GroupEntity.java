@@ -17,6 +17,7 @@ public class GroupEntity {
     private String groupName;
 
     // a group has many requests
+    // mappedBy = groupEntity as it is mapped with RequestEntity class
     @OneToMany(mappedBy = "groupEntity", cascade = CascadeType.ALL)
     private List<RequestEntity> requestEntities;
 

@@ -42,9 +42,11 @@ public class RequestEntity {
 //    A request belongs to a Group
     @ManyToOne
     @JoinColumn(name="group_id", nullable= true)
+    // this groupEntity should be mapped with Group's one-to-many decoration
     private GroupEntity groupEntity;
 
     // Again, A request have many responses
+    // mappedBy = requestEntity as it is declared in ResponsesEntity class
     @OneToMany(mappedBy = "requestEntity", cascade = CascadeType.ALL)
     private List<ResponsesEntity> responsesEntities;
 

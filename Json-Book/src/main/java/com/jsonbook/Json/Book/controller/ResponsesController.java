@@ -31,4 +31,9 @@ public class ResponsesController {
     public ResponsesEntity updateResponses(@RequestBody ResponsesEntity responsesEntity){
         return responsesService.updateResponses(responsesEntity);
     }
+
+    @GetMapping("/{responsesId}")
+    public List<ResponsesEntity> findResponsesById(@PathVariable("responsesId") Long responsesId){
+        return responsesService.findResponsesById(responsesId);
+    }
 }
