@@ -1,15 +1,12 @@
 package com.jsonbook.Json.Book.entity;
 
-
 import org.hibernate.annotations.Type;
 import org.springframework.web.bind.annotation.RequestMethod;
-import sun.security.krb5.internal.crypto.EType;
-
 import javax.persistence.*;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Map;
-
+import com.jsonbook.Json.Book.AuthenticationType;
+import com.jsonbook.Json.Book.RequestBodyType;
 @Entity
 @Table(name="requests")
 public class Requests {
@@ -78,6 +75,8 @@ public class Requests {
 
     @OneToMany(mappedBy = "requests", cascade = CascadeType.ALL)
     private List<ResponsesEntity> responsesEntities;
+    @OneToMany(mappedBy = "requests", cascade = CascadeType.ALL)
+    private List<Forms> forms;
 
     public Requests(){}
 
@@ -199,27 +198,5 @@ public class Requests {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.groups = groups;
-    }
-}
-enum AuthenticationType{
-    NO_AUTH("No Auth"),
-    API_KEY("API Key"),
-    BEARER_TOKEN("Bearer Token"),
-    JWT_BEARER("JWT Bearer"),
-    BASIC_AUTH("Basic Auth");
-    public final String label;
-    private AuthenticationType(String label){
-        this.label=label;
-    }
-}
-enum RequestBodyType{
-    NONE("none"),
-    RAW("raw"),
-    FORM_DATA("form-data"),
-    FORM_ENCODED("x-www-form-urlencoded"),
-    BASIC_AUTH("Basic Auth");
-    public final String label;
-    private RequestBodyType(String label){
-        this.label=label;
     }
 }
