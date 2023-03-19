@@ -13,6 +13,6 @@ import java.util.List;
 public interface ResponsesRepository extends JpaRepository<ResponsesEntity, Long> {
     // for many to one relationship
     // there are two responses table exist in our database namely responses_table and responses table_2
-    @Query(value = "SELECT * FROM responses_table_2 WHERE responses_id = :id", nativeQuery = true)
+    @Query(value = "SELECT * FROM responses_table_2 WHERE request_id = :id", nativeQuery = true)
     List<ResponsesEntity> findResponsesById(@Param("id") Long id);
 }
