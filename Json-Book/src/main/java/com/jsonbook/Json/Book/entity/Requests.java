@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import javax.persistence.*;
 import java.time.ZonedDateTime;
 import java.util.List;
-import com.jsonbook.Json.Book.AuthenticationType;
+import com.jsonbook.Json.Book.AuthorizationType;
 import com.jsonbook.Json.Book.RequestBodyType;
 @Entity
 @Table(name="requests")
@@ -43,7 +43,7 @@ public class Requests {
 
     @Enumerated(EnumType.STRING)
     @Column(name="request_authentication_type")
-    private AuthenticationType authenticationType;
+    private AuthorizationType authenticationType;
 
     @Lob
     @Type(type = "org.hibernate.type.TextType")
@@ -73,6 +73,14 @@ public class Requests {
     private List<ResponsesEntity> responsesEntities;
     @OneToMany(mappedBy = "requests", cascade = CascadeType.ALL)
     private List<Forms> forms;
+    @OneToMany(mappedBy = "requests", cascade = CascadeType.ALL)
+    private List<BasicAuthorization> basicAuthorizations;
+
+    @OneToMany(mappedBy = "requests", cascade = CascadeType.ALL)
+    private List<ApiKeyAuthorization> apiKeyAuthorizations;
+
+    @OneToMany(mappedBy = "requests", cascade = CascadeType.ALL)
+    private List<JwtBearer> jwtBearers;
 
     public Requests(){}
 
@@ -100,7 +108,7 @@ public class Requests {
         this.requestParam = requestParam;
     }
 
-    public void setAuthenticationType(AuthenticationType authenticationType) {
+    public void setAuthenticationType(AuthorizationType authenticationType) {
         this.authenticationType = authenticationType;
     }
 
@@ -152,7 +160,7 @@ public class Requests {
         return requestParam;
     }
 
-    public AuthenticationType getAuthenticationType() {
+    public AuthorizationType getAuthenticationType() {
         return authenticationType;
     }
 
@@ -180,7 +188,7 @@ public class Requests {
         return groups;
     }
 
-    public Requests(long requestId, String requestName, RequestMethod requestMethod, String url, String requestHeader, String requestParam, AuthenticationType authenticationType, String requestBearerToken, RequestBodyType requestBodyType, String requestBodyRaw, ZonedDateTime createdAt, ZonedDateTime updatedAt, Groups groups) {
+    public Requests(long requestId, String requestName, RequestMethod requestMethod, String url, String requestHeader, String requestParam, AuthorizationType authenticationType, String requestBearerToken, RequestBodyType requestBodyType, String requestBodyRaw, ZonedDateTime createdAt, ZonedDateTime updatedAt, Groups groups) {
         this.requestId = requestId;
         this.requestName = requestName;
         this.requestMethod = requestMethod;

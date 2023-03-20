@@ -1,6 +1,6 @@
 package com.jsonbook.Json.Book;
 
-public enum AuthenticationType {
+public enum AuthorizationType {
     NO_AUTH("No Auth"),
     API_KEY("API Key"),
     BEARER_TOKEN("Bearer Token"),
@@ -8,7 +8,7 @@ public enum AuthenticationType {
     BASIC_AUTH("Basic Auth");
     public final String label;
 
-    private AuthenticationType(String label) {
+    private AuthorizationType(String label) {
         this.label = label;
     }
 }
