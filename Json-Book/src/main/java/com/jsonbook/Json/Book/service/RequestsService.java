@@ -1,5 +1,6 @@
 package com.jsonbook.Json.Book.service;
 
+import com.jsonbook.Json.Book.entity.RequestFormDto;
 import com.jsonbook.Json.Book.entity.Requests;
 
 import java.util.List;
@@ -12,4 +13,5 @@ public interface RequestsService {
 
     Requests findRequests(long id);
     List<Requests> findRequestsById(long id);
+    RequestFormDto saveRequestsForms(RequestFormDto requestFormDto);
 }

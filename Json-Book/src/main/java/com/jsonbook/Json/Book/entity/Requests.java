@@ -26,7 +26,6 @@ public class Requests {
     @Type(type = "org.hibernate.type.TextType")
     @Column(name = "request_url",nullable = false)
     private String url;
-
     /*@Column(name = "request_header")
     @Type(type = "org.hibernate.type.PostgresHstoreType")
     private Map<String,String> requestHeader;*/
@@ -34,12 +33,9 @@ public class Requests {
     @Lob
     @Type(type = "org.hibernate.type.TextType")
     private String requestHeader;;
-
-
     /*@Column(name = "request_param")
     @Type(type = "org.hibernate.type.PostgresHstoreType")
     private Map<String,String> requestParam;*/
-
     @Column(name = "request_param")
     @Lob
     @Type(type = "org.hibernate.type.TextType")

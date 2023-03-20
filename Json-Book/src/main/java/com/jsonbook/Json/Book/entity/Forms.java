@@ -75,6 +75,17 @@ public class Forms {
         return requestBodyType;
     }
 
+    @Override
+    public String toString() {
+        return "Forms{" +
+                "formId=" + formId +
+                ", formKey='" + formKey + '\'' +
+                ", formValue='" + formValue + '\'' +
+                ", requestBodyType=" + requestBodyType +
+                ", requests=" + requests +
+                '}';
+    }
+
     public Requests getRequests() {
         return requests;
     }

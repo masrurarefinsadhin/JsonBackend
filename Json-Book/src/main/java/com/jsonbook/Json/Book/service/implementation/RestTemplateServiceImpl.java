@@ -46,9 +46,10 @@ public class RestTemplateServiceImpl implements RestTemplateService {
             RequestMethod requestMethod= requests.getRequestMethod();
             switch (requestMethod){
                 case GET: return getMethod(requests);
-                case POST: return postMethod(requests);
-                case DELETE: return "";
-                case PUT: return "";
+                case POST:
+                case PUT:
+                    return postMethod(requests);
+                case DELETE: return deleteMethod(requests);
             }
         }
         catch (Exception e){return e.toString();}
@@ -59,7 +60,6 @@ public class RestTemplateServiceImpl implements RestTemplateService {
         URI uri= setParameters(requests.getRequestParam(),requests.getUrl());
         HttpHeaders headers= setHeaders(requests.getRequestHeader());
         HttpEntity<String> entity = new HttpEntity<>( headers);
-
         Instant requestedAt= Instant.now();
         ResponseEntity<String> s=restTemplate.exchange(uri, HttpMethod.GET, entity, String.class);
         Instant respondedAt = Instant.now();
@@ -68,7 +68,7 @@ public class RestTemplateServiceImpl implements RestTemplateService {
         String responseStatus= s.getStatusCode().toString();
         String responseBody=s.getBody();
         responsesService.saveResponses(new ResponsesEntity( null,responseStatus, responseBody,requestedAt,respondedAt,timeInMils,requests));
-        return responseStatus;
+        return responseBody+responseStatus;
     }
     private RestTemplate getAuthentication(RestTemplate restTemplate, Requests requests){
         /*String authenticationType= requests.getAuthenticationType();
@@ -78,9 +78,6 @@ public class RestTemplateServiceImpl implements RestTemplateService {
         return restTemplate;
     }
     private String postMethod(Requests requests){
-        //formsService.addForms(new Forms( null,"key1","value2",requests.getRequestBodyType() ,requests));
-        //formsService.addForms(new Forms( null,"key2","value2",requests.getRequestBodyType() ,requests));
-
         RestTemplate restTemplate=  new RestTemplate();
         URI uri= setParameters(requests.getRequestParam(),requests.getUrl());
         HttpHeaders headers= setHeaders(requests.getRequestHeader());
@@ -94,25 +91,15 @@ public class RestTemplateServiceImpl implements RestTemplateService {
             String requestBodyRaw=requests.getRequestBodyRaw();
             System.out.println("raw type"+requestBodyRaw);
             if(requestBodyRaw !=null){
-                requestBodyRaw="{\"title\":\"BMW Pencil\"}";
+                //requestBodyRaw="{\"title\":\"BMW Pencil\"}";
                 HttpEntity<String> entity = new HttpEntity<>(requestBodyRaw, headers);
                 requestedAt= Instant.now();
                 responseSet=restTemplate.exchange(uri, HttpMethod.POST, entity, String.class);
                 respondedAt = Instant.now();
             }
         }
-        else if (requestBodyType==RequestBodyType.FORM_DATA) {
-            List<Forms> forms= formsService.findFormsByRequestId(requests.getRequestId(),requestBodyType);
-            for (Forms obj : forms) {System.out.println(obj.getFormKey());}
-            MultiValueMap<String, String> f = new LinkedMultiValueMap<>();
-            for (Forms obj : forms) {f.add(obj.getFormKey(),obj.getFormValue());}
-            HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(f, headers);
-            requestedAt= Instant.now();
-            responseSet=restTemplate.exchange(uri, HttpMethod.POST, entity, String.class);
-            respondedAt = Instant.now();
-        }
-        else if (requestBodyType==RequestBodyType.FORM_ENCODED) {
-            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        else if (requestBodyType==RequestBodyType.FORM_ENCODED || requestBodyType==RequestBodyType.FORM_DATA) {
+            if (requestBodyType==RequestBodyType.FORM_ENCODED){headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);}
             List<Forms> forms= formsService.findFormsByRequestId(requests.getRequestId(),requestBodyType);
             for (Forms obj : forms) {System.out.println(obj.getFormKey());}
             MultiValueMap<String, String> f = new LinkedMultiValueMap<>();
@@ -127,7 +114,7 @@ public class RestTemplateServiceImpl implements RestTemplateService {
         String responseStatus= responseSet.getStatusCode().toString();
         String responseBody=responseSet.getBody();
         responsesService.saveResponses(new ResponsesEntity( null,responseStatus, responseBody,requestedAt,respondedAt,timeInMils,requests));
-        return responseBody;
+        return responseBody+responseStatus;
     }
 
     private HttpHeaders setHeaders(String requestHeader){
@@ -166,6 +153,23 @@ public class RestTemplateServiceImpl implements RestTemplateService {
             }
         }
         return list;
+    }
+    private String deleteMethod( Requests requests){
+        RestTemplate restTemplate=  new RestTemplate();
+        String url_r = requests.getUrl();
+        HttpHeaders headers = setHeaders(requests.getRequestHeader());
+        String requestParam= requests.getRequestParam();
+        URI uri= setParameters(requests.getRequestParam(),requests.getUrl());
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        Instant requestedAt= Instant.now();
+        ResponseEntity<String> s=restTemplate.exchange(uri, HttpMethod.DELETE, entity, String.class);
+        Instant respondedAt = Instant.now();
+        long timeInMils = Duration.between(requestedAt, respondedAt).toMillis();
+        String responseStatus= s.getStatusCode().toString();
+        String responseBody=s.getBody();
+        responsesService.saveResponses(new ResponsesEntity( null,responseStatus, responseBody,requestedAt,respondedAt,timeInMils,requests));
+        return responseBody+responseStatus;
+
     }
 
 }
