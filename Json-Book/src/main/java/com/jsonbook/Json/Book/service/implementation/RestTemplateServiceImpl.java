@@ -92,10 +92,12 @@ public class RestTemplateServiceImpl implements RestTemplateService {
         RequestBodyType requestBodyType=requests.getRequestBodyType();
         if (requestBodyType == RequestBodyType.RAW) {
             String requestBodyRaw=requests.getRequestBodyRaw();
+            System.out.println("raw type"+requestBodyRaw);
             if(requestBodyRaw !=null){
-                HttpEntity<String> entity= new HttpEntity<>(requestBodyRaw,headers);
+                requestBodyRaw="{\"title\":\"BMW Pencil\"}";
+                HttpEntity<String> entity = new HttpEntity<>(requestBodyRaw, headers);
                 requestedAt= Instant.now();
-                ResponseEntity<String> s=restTemplate.exchange(uri, HttpMethod.POST, entity, String.class);
+                responseSet=restTemplate.exchange(uri, HttpMethod.POST, entity, String.class);
                 respondedAt = Instant.now();
             }
         }
