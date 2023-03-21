@@ -1,93 +1,127 @@
 package com.jsonbook.Json.Book.entity;
-import java.util.Collection;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
-import javax.persistence.JoinColumn;
+
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Entity
-@Table(name =  "usersV2", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
+@Table(name = "users")
+@EnableJpaRepositories
 public class User {
 
     @Id
-    @GeneratedValue(strategy =  GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue
+    private long id;
 
-    @Column(name = "first_name")
-    private String firstName;
-
-    @Column(name = "last_name")
-    private String lastName;
-
+    @Column(name="email")
     private String email;
 
+    @Column(name="password")
     private String password;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "users_roles",
-            joinColumns = @JoinColumn(
-                    name = "user_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(
-                    name = "role_id", referencedColumnName = "id"))
+    @Column(name="first_name")
+    private String firstName;
 
-    private Collection<Role> roles;
+    @Column(name="middle_name")
+    private String middleName;
+
+    @Column(name="last_name")
+    private String lastName;
+
+    @Column(name="mobile")
+    private String mobile;
+
+    @Column(name="address")
+    private String address;
+
+//	@Column(name="isActive")
+//	private boolean isActive;
 
     public User() {
 
     }
 
-    public User(String firstName, String lastName, String email, String password, Collection<Role> roles) {
+    public User(String email, String password, String firstName, String middleName, String lastName, String mobile, String address) {
         super();
-        this.firstName = firstName;
-        this.lastName = lastName;
         this.email = email;
         this.password = password;
-        this.roles = roles;
+        this.firstName = firstName;
+        this.middleName = middleName;
+        this.lastName = lastName;
+        this.mobile = mobile;
+        this.address = address;
+
     }
-    public Long getId() {
+
+    public long getId() {
         return id;
     }
-    public void setId(Long id) {
+
+    public void setId(long id) {
         this.id = id;
     }
-    public String getFirstName() {
-        return firstName;
-    }
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-    public String getLastName() {
-        return lastName;
-    }
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
+
     public String getEmail() {
         return email;
     }
+
     public void setEmail(String email) {
         this.email = email;
     }
+
     public String getPassword() {
         return password;
     }
+
     public void setPassword(String password) {
         this.password = password;
     }
-    public Collection<Role> getRoles() {
-        return roles;
+
+    public String getFirstName() {
+        return firstName;
     }
-    public void setRoles(Collection<Role> roles) {
-        this.roles = roles;
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
+
+    public String getMiddleName() {
+        return middleName;
+    }
+
+    public void setMiddleName(String middleName) {
+        this.middleName = middleName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+
+
+
 
 }
