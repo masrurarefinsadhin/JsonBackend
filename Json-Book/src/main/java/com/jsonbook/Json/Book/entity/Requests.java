@@ -73,14 +73,14 @@ public class Requests {
     private List<ResponsesEntity> responsesEntities;
     @OneToMany(mappedBy = "requests", cascade = CascadeType.ALL)
     private List<Forms> forms;
-    @OneToMany(mappedBy = "requests", cascade = CascadeType.ALL)
-    private List<BasicAuthorization> basicAuthorizations;
+    @OneToOne(mappedBy = "requests", cascade = CascadeType.ALL)
+    private BasicAuthorization basicAuthorizations;
 
-    @OneToMany(mappedBy = "requests", cascade = CascadeType.ALL)
-    private List<ApiKeyAuthorization> apiKeyAuthorizations;
+    @OneToOne(mappedBy = "requests", cascade = CascadeType.ALL)
+    private ApiKeyAuthorization apiKeyAuthorizations;
 
-    @OneToMany(mappedBy = "requests", cascade = CascadeType.ALL)
-    private List<JwtBearer> jwtBearers;
+    @OneToOne(mappedBy = "requests", cascade = CascadeType.ALL)
+    private JwtBearer jwtBearers;
 
     public Requests(){}
 

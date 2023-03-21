@@ -34,7 +34,7 @@ public class JwtBearer {
     @Type(type = "org.hibernate.type.TextType")
     private String jwtPayload;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name="request_id",nullable = false)
     private Requests requests;
 

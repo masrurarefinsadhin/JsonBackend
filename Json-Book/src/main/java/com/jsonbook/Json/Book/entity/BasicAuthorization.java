@@ -61,7 +61,7 @@ public class BasicAuthorization {
     private String basicPassword;
 
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name="request_id",nullable = false)
     private Requests requests;
 }
