@@ -12,6 +12,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -35,11 +36,12 @@ public class RestTemplateServiceImpl implements RestTemplateService {
     public String getResponse(long id) {
         try {
             Requests requests= requestsService.findRequests(id);
+            long requestId = requests.getRequestId();
             RequestMethod requestMethod= requests.getRequestMethod();
             switch (requestMethod){
                 case GET: return getMethod(requests);
                 case POST: return "";
-                case DELETE: return "";
+                case DELETE: return deleteMethod(requestId, requests);
                 case PUT: return "";
             }
         }
@@ -119,5 +121,55 @@ public class RestTemplateServiceImpl implements RestTemplateService {
         String responseBody=s.getBody();
         responsesService.saveResponses(new ResponsesEntity( null,responseStatus, responseBody,requestedAt,respondedAt,timeInMils,requests));
         return s.getBody();
+    }
+
+    private String deleteMethod(@PathVariable("requestId") long requestId, Requests requests){
+        System.out.println("here inn delete");
+        RestTemplate restTemplate=  new RestTemplate();
+//        String url_r= "http://localhost:8080/requests/";
+        String url_r = requests.getUrl();
+//        System.out.println(url_r);
+        requestId = requests.getRequestId();
+//        System.out.println(requestId);
+        //define header
+        HttpHeaders headers = new HttpHeaders();
+        // getting request header
+        String requestHeader=requests.getRequestHeader();
+        if(requestHeader != null){
+            JSONObject jsonObjectHeader = new JSONObject(requestHeader);
+            for(String key: jsonObjectHeader.keySet()){
+                headers.set(key, (String) jsonObjectHeader.get(key));
+            }
+        }
+
+        String requestParam= requests.getRequestParam();
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<String, String>();
+        if (requestParam!=null){
+            JSONObject jsonObjectParam = new JSONObject(requestParam);
+            for(String key: jsonObjectParam.keySet()){
+                System.out.println(key);
+                System.out.println(jsonObjectParam.get(key));
+                params.set(key, (String) jsonObjectParam.get(key));
+            }
+            System.out.println(params);
+        }
+
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url_r).queryParams(params);
+        URI uri = URI.create(builder.toUriString());
+        // perform delete
+
+        HttpEntity<String> entity = new HttpEntity<>( headers);
+        Instant requestedAt= Instant.now();
+        ResponseEntity<String> s=restTemplate.exchange(uri, HttpMethod.DELETE, entity, String.class);
+//        return restTemplate.exchange(url_r + requestId, HttpMethod.DELETE, entity, String.class).getBody();
+        Instant respondedAt = Instant.now();
+        long timeInMils = Duration.between(requestedAt, respondedAt).toMillis();
+        System.out.println(s.getStatusCode());
+        String responseStatus= s.getStatusCode().toString();
+        String responseBody=s.getBody();
+        responsesService.saveResponses(new ResponsesEntity( null,responseStatus, responseBody,requestedAt,respondedAt,timeInMils,requests));
+        return s.getBody();
+
     }
 }
