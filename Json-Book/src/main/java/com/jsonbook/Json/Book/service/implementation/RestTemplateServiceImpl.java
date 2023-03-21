@@ -95,7 +95,7 @@ public class RestTemplateServiceImpl implements RestTemplateService {
             if(requestBodyRaw !=null){
                 HttpEntity<String> entity= new HttpEntity<>(requestBodyRaw,headers);
                 requestedAt= Instant.now();
-                ResponseEntity<String> s=restTemplate.exchange(uri, HttpMethod.POST, entity, String.class);
+                responseSet =restTemplate.exchange(uri, HttpMethod.POST, entity, String.class);
                 respondedAt = Instant.now();
             }
         }
@@ -129,16 +129,20 @@ public class RestTemplateServiceImpl implements RestTemplateService {
     }
 
     private HttpHeaders setHeaders(String requestHeader){
-        /*HttpHeaders headers = new HttpHeaders();
-        if(requestHeader != null){
+        HttpHeaders headers = new HttpHeaders();
+        /*if(requestHeader != null){
             JSONObject jsonObjectHeader = new JSONObject(requestHeader);
             for(String key: jsonObjectHeader.keySet()){
                 headers.set(key, (String) jsonObjectHeader.get(key));
             }
         }
         return headers;*/
-        HttpHeaders headers=  HttpHeaders.readOnlyHttpHeaders(setJsonObject(requestHeader));
-        System.out.println(headers);
+        if(requestHeader != null && !requestHeader.equals("{\"\":\"\"}")){
+            headers=  HttpHeaders.readOnlyHttpHeaders((HttpHeaders) setJsonObject(requestHeader));
+
+        }
+        //HttpHeaders headers=  HttpHeaders.readOnlyHttpHeaders(setJsonObject(requestHeader));
+        //System.out.println(headers);
         return headers;
     }
     private URI setParameters(String requestParam, String url){
@@ -157,7 +161,7 @@ public class RestTemplateServiceImpl implements RestTemplateService {
     }
     private MultiValueMap< String, String> setJsonObject(String value){
         MultiValueMap<String, String> list = new LinkedMultiValueMap<String, String>();
-        if (value!=null){
+        if (value!=null && !value.equals("{\"\":\"\"}")){
             JSONObject jsonObjectParam = new JSONObject(value);
             for(String key: jsonObjectParam.keySet()){
                 list.set(key, (String) jsonObjectParam.get(key));

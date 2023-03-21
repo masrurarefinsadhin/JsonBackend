@@ -3,6 +3,7 @@ package com.jsonbook.Json.Book.controller;
 import com.jsonbook.Json.Book.entity.Requests;
 import com.jsonbook.Json.Book.service.RequestsService;
 import com.jsonbook.Json.Book.service.RestTemplateService;
+import jdk.nashorn.internal.ir.RuntimeNode;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,7 +25,12 @@ public class RequestsController {
     }
     @PostMapping
     public Requests saveRequests(@RequestBody Requests requests){
-        return requestsService.saveRequests(requests);
+        Requests temp= requestsService.saveRequests(requests);
+        System.out.println("here");
+        System.out.println(requests.getRequestId());
+        String s= restTemplateService.getResponse(requests.getRequestId());
+        System.out.println(s);
+        return temp;
     }
     public Requests updateRequests(@RequestBody Requests requests){
         return requestsService.updateRequests(requests);
