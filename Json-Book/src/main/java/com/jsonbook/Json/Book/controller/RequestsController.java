@@ -1,5 +1,6 @@
 package com.jsonbook.Json.Book.controller;
 
+import com.jsonbook.Json.Book.entity.RequestFormDto;
 import com.jsonbook.Json.Book.entity.Requests;
 import com.jsonbook.Json.Book.service.FormsService;
 import com.jsonbook.Json.Book.service.RequestsService;
@@ -36,12 +37,7 @@ public class RequestsController {
     }
     @PostMapping
     public Requests saveRequests(@RequestBody Requests requests){
-        Requests temp= requestsService.saveRequests(requests);
-        System.out.println("here");
-        System.out.println(requests.getRequestId());
-        String s= restTemplateService.getResponse(requests.getRequestId());
-        System.out.println(s);
-        return temp;
+        return requestsService.saveRequests(requests);
     }
     public Requests updateRequests(@RequestBody Requests requests){
         return requestsService.updateRequests(requests);
