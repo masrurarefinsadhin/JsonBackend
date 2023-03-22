@@ -2,6 +2,7 @@ package com.jsonbook.Json.Book.service.implementation;
 
 import com.jsonbook.Json.Book.AuthorizationType;
 import com.jsonbook.Json.Book.HeaderParamType;
+import com.jsonbook.Json.Book.JwtAlgoType;
 import com.jsonbook.Json.Book.RequestBodyType;
 import com.jsonbook.Json.Book.entity.*;
 import com.jsonbook.Json.Book.repository.RequestsRepository;
@@ -15,6 +16,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import java.util.Base64;
 
 import java.net.URI;
 import java.time.Duration;
@@ -29,17 +31,24 @@ public class RestTemplateServiceImpl implements RestTemplateService {
     private  final FormsService formsService;
     private final BasicAuthorizationService basicAuthorizationService;
     private final ApiKeyAuthorizationService apiKeyAuthorizationService;
-    public RestTemplateServiceImpl(RequestsRepository requestsRepository, ResponsesRepository responsesRepository, ResponsesService responsesService, RequestsService requestsService, FormsService formsService,BasicAuthorizationService basicAuthorizationService,ApiKeyAuthorizationService apiKeyAuthorizationService) {
+    private final JwtBearerService jwtBearerService;
+
+    public RestTemplateServiceImpl(RequestsRepository requestsRepository, ResponsesService responsesService, RequestsService requestsService, FormsService formsService, BasicAuthorizationService basicAuthorizationService, ApiKeyAuthorizationService apiKeyAuthorizationService, JwtBearerService jwtBearerService) {
         this.requestsRepository = requestsRepository;
         this.responsesService = responsesService;
         this.requestsService = requestsService;
+        this.formsService = formsService;
+        this.basicAuthorizationService = basicAuthorizationService;
+        this.apiKeyAuthorizationService = apiKeyAuthorizationService;
+        this.jwtBearerService = jwtBearerService;
     }
 
 
     @Override
     public String getResponse(long id) {
         try {
-            Requests requests= requestsService.findRequests(id);
+            Requests requests= requestsService.findRequests(id)
+                    ;
             RequestMethod requestMethod= requests.getRequestMethod();
             AuthorizationType authorizationType= requests.getAuthenticationType();
             HttpHeaders headers= setHeaders(requests.getRequestHeader());
@@ -64,6 +73,48 @@ public class RestTemplateServiceImpl implements RestTemplateService {
                                         .queryParam(apiKeyAuthorization.getApiKey(), apiKeyAuthorization.getApiValue());
                                 uri=URI.create(builder.toUriString());
                         }
+                    case JWT_BEARER:
+                        JwtBearer jwtBearer = jwtBearerService.findJwtBearer(requests);
+
+                        JwtAlgoType jwtAlgoType = jwtBearer.getJwtAlgoType();
+                        HeaderParamType headerParamType_jwt = jwtBearer.getHeaderParamType();
+                        String secret = jwtBearer.getJwtSecret();
+//                                String algoType = jwtBearer.getJwtAlgoType();
+                        boolean encoded = jwtBearer.getJwtEncoded();
+                        // Getting encoder
+                        Base64.Encoder encoder = Base64.getEncoder();
+                        if(encoded == true){
+                            secret = encoder.encodeToString(secret.getBytes());
+                        }
+
+                        switch (jwtAlgoType){
+                            case HS256:
+                                if (headerParamType_jwt == HeaderParamType.HEADER){
+                                    headers.set(secret, jwtBearer.getJwtPayload());
+                                }else if(headerParamType_jwt == HeaderParamType.PARAM){
+                                    UriComponentsBuilder builder = UriComponentsBuilder.fromUri(uri)
+                                            .queryParam(secret, jwtBearer.getJwtPayload());
+                                    uri=URI.create(builder.toUriString());
+                                }
+
+                            case RS256:
+                                if (headerParamType_jwt == HeaderParamType.HEADER){
+                                    headers.set(secret, jwtBearer.getJwtPayload());
+                                }else if(headerParamType_jwt == HeaderParamType.PARAM){
+                                    UriComponentsBuilder builder = UriComponentsBuilder.fromUri(uri)
+                                            .queryParam(secret, jwtBearer.getJwtPayload());
+                                    uri=URI.create(builder.toUriString());
+                                }
+
+                            case ES256:
+                                if (headerParamType_jwt == HeaderParamType.HEADER){
+                                    headers.set(secret, jwtBearer.getJwtPayload());
+                                }else if(headerParamType_jwt == HeaderParamType.PARAM){
+                                    UriComponentsBuilder builder = UriComponentsBuilder.fromUri(uri)
+                                            .queryParam(secret, jwtBearer.getJwtPayload());
+                                    uri=URI.create(builder.toUriString());
+                                }
+                        }
                 }
             }
 
@@ -77,21 +128,6 @@ public class RestTemplateServiceImpl implements RestTemplateService {
         catch (Exception e){return e.toString();}
         return null;
     }
-    private String getMethod(Requests requests){
-        //String url= requests.getUrl();
-        //String requestHeader= requests.getRequestHeader();
-        //String requestParam= requests.getRequestParam();
-        RestTemplate restTemplate=  new RestTemplate();
-        //String url= "https://dummyjson.com/products";
-        String url=requests.getUrl();
-        //MultiValueMap<String, String> headers = new LinkedMultiValueMap<String, String>();
-        HttpHeaders headers = new HttpHeaders();
-        //System.out.println(headers);
-        //headers.setContentType(MediaType.APPLICATION_JSON);
-        //System.out.println(headers);
-        //headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        //System.out.println(headers);
-        //headers.setContentType(MediaType.APPLICATION_JSON);
 
     private HttpHeaders setAuthorization(Requests requests, HttpHeaders headers, AuthorizationType authorizationType) {
         switch (authorizationType){
@@ -167,62 +203,11 @@ public class RestTemplateServiceImpl implements RestTemplateService {
         Instant requestedAt= Instant.now();
         ResponseEntity<String> response=restTemplate.exchange(uri, httpMethod, (HttpEntity<?>)entity, String.class);
         Instant respondedAt = Instant.now();
-        System.out.println(requestedAt);
-        System.out.println(respondedAt);
         long timeInMils = Duration.between(requestedAt, respondedAt).toMillis();
         String responseStatus= response.getStatusCode().toString();
         String responseBody=response.getBody();
         responsesService.saveResponses(new ResponsesEntity( null,responseStatus, responseBody,requestedAt,respondedAt,timeInMils,requests));
-        return s.getBody();
+        return responseBody+responseStatus;
     }
 
-    private String deleteMethod(@PathVariable("requestId") long requestId, Requests requests){
-        System.out.println("here inn delete");
-        RestTemplate restTemplate=  new RestTemplate();
-//        String url_r= "http://localhost:8080/requests/";
-        String url_r = requests.getUrl();
-//        System.out.println(url_r);
-        requestId = requests.getRequestId();
-//        System.out.println(requestId);
-        //define header
-        HttpHeaders headers = new HttpHeaders();
-        // getting request header
-        String requestHeader=requests.getRequestHeader();
-        if(requestHeader != null){
-            JSONObject jsonObjectHeader = new JSONObject(requestHeader);
-            for(String key: jsonObjectHeader.keySet()){
-                headers.set(key, (String) jsonObjectHeader.get(key));
-            }
-        }
-
-        String requestParam= requests.getRequestParam();
-
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<String, String>();
-        if (requestParam!=null){
-            JSONObject jsonObjectParam = new JSONObject(requestParam);
-            for(String key: jsonObjectParam.keySet()){
-                System.out.println(key);
-                System.out.println(jsonObjectParam.get(key));
-                params.set(key, (String) jsonObjectParam.get(key));
-            }
-            System.out.println(params);
-        }
-
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url_r).queryParams(params);
-        URI uri = URI.create(builder.toUriString());
-        // perform delete
-
-        HttpEntity<String> entity = new HttpEntity<>( headers);
-        Instant requestedAt= Instant.now();
-        ResponseEntity<String> s=restTemplate.exchange(uri, HttpMethod.DELETE, entity, String.class);
-//        return restTemplate.exchange(url_r + requestId, HttpMethod.DELETE, entity, String.class).getBody();
-        Instant respondedAt = Instant.now();
-        long timeInMils = Duration.between(requestedAt, respondedAt).toMillis();
-        System.out.println(s.getStatusCode());
-        String responseStatus= s.getStatusCode().toString();
-        String responseBody=s.getBody();
-        responsesService.saveResponses(new ResponsesEntity( null,responseStatus, responseBody,requestedAt,respondedAt,timeInMils,requests));
-        return s.getBody();
-
-    }
 }

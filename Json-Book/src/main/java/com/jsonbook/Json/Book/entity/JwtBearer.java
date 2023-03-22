@@ -38,4 +38,72 @@ public class JwtBearer {
     @JoinColumn(name="request_id",nullable = false)
     private Requests requests;
 
+    public JwtBearer() {
+    }
+
+    public JwtBearer(Long jwtId, JwtAlgoType jwtAlgoType, HeaderParamType headerParamType, String jwtSecret, Boolean jwtEncoded, String jwtPayload, Requests requests) {
+        this.jwtId = jwtId;
+        this.jwtAlgoType = jwtAlgoType;
+        this.headerParamType = headerParamType;
+        this.jwtSecret = jwtSecret;
+        this.jwtEncoded = jwtEncoded;
+        this.jwtPayload = jwtPayload;
+        this.requests = requests;
+    }
+
+    public Long getJwtId() {
+        return jwtId;
+    }
+
+    public void setJwtId(Long jwtId) {
+        this.jwtId = jwtId;
+    }
+
+    public JwtAlgoType getJwtAlgoType() {
+        return jwtAlgoType;
+    }
+
+    public void setJwtAlgoType(JwtAlgoType jwtAlgoType) {
+        this.jwtAlgoType = jwtAlgoType;
+    }
+
+    public HeaderParamType getHeaderParamType() {
+        return headerParamType;
+    }
+
+    public void setHeaderParamType(HeaderParamType headerParamType) {
+        this.headerParamType = headerParamType;
+    }
+
+    public String getJwtSecret() {
+        return jwtSecret;
+    }
+
+    public void setJwtSecret(String jwtSecret) {
+        this.jwtSecret = jwtSecret;
+    }
+
+    public Boolean getJwtEncoded() {
+        return jwtEncoded;
+    }
+
+    public void setJwtEncoded(Boolean jwtEncoded) {
+        this.jwtEncoded = jwtEncoded;
+    }
+
+    public String getJwtPayload() {
+        return jwtPayload;
+    }
+
+    public void setJwtPayload(String jwtPayload) {
+        this.jwtPayload = jwtPayload;
+    }
+
+    public Requests getRequests() {
+        return requests;
+    }
+
+    public void setRequests(Requests requests) {
+        this.requests = requests;
+    }
 }
