@@ -1,5 +1,8 @@
 package com.jsonbook.Json.Book.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import org.hibernate.annotations.Type;
 import org.springframework.web.bind.annotation.RequestMethod;
 import javax.persistence.*;
@@ -67,6 +70,8 @@ public class Requests {
 
     @ManyToOne
     @JoinColumn(name="group_id" , nullable = false)
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "groupId")
+    @JsonIdentityReference(alwaysAsId = true)
     private Groups groups;
 
     @OneToMany(mappedBy = "requests", cascade = CascadeType.ALL)

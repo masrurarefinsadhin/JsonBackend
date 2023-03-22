@@ -67,6 +67,7 @@ public class UserController {
 
                 response.put("accessToken", jwt);
                 response.put("email", use.getEmail());
+                response.put("id",use.getId());
                 response.put("description", "Successful");
             } else {
                 response.put("message", "Failed");

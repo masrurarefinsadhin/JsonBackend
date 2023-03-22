@@ -71,10 +71,10 @@ public class RestTemplateServiceImpl implements RestTemplateService {
             }
 
             switch (requestMethod){
-                case GET: return returnResponse(uri,HttpMethod.GET,new HttpEntity<>( headers),requests);
+                case GET: return returnResponse(uri,HttpMethod.GET,new HttpEntity<String>( headers),requests);
                 case POST: return postMethod(requests,headers,uri,HttpMethod.POST);
                 case PUT: return postMethod(requests,headers,uri,HttpMethod.PUT);
-                case DELETE: return returnResponse(uri,HttpMethod.DELETE,new HttpEntity<>(headers),requests);
+                case DELETE: return returnResponse(uri,HttpMethod.DELETE,new HttpEntity<String>(headers),requests);
             }
         }
         catch (Exception e){return e.toString();}
@@ -125,19 +125,18 @@ public class RestTemplateServiceImpl implements RestTemplateService {
     }
 
     private URI setParameters(String requestParam, String url){
-
         MultiValueMap<String, String> params = setJsonObject(requestParam);
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url)
                 .queryParams(params);
         return URI.create(builder.toUriString());
     }
 
-    private MultiValueMap< String, String> setJsonObject(String value){
-        MultiValueMap<String, String> list = new LinkedMultiValueMap<>();
+    private HttpHeaders setJsonObject(String value){
+        HttpHeaders list = new HttpHeaders();
         if (value!=null){
             JSONObject jsonObjectParam = new JSONObject(value);
             for(String key: jsonObjectParam.keySet()){
-                list.set(key, (String) jsonObjectParam.get(key));
+                list.add(key,(String) jsonObjectParam.get(key));
             }
         }
         return list;
