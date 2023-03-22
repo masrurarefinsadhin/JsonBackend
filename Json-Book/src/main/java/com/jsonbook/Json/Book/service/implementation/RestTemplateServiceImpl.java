@@ -15,6 +15,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+
 import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
@@ -28,7 +29,7 @@ public class RestTemplateServiceImpl implements RestTemplateService {
     private  final FormsService formsService;
     private final BasicAuthorizationService basicAuthorizationService;
     private final ApiKeyAuthorizationService apiKeyAuthorizationService;
-    public RestTemplateServiceImpl(RequestsRepository requestsRepository, ResponsesRepository responsesRepository, ResponsesService responsesService, RequestsService requestsService, FormsService formsService, BasicAuthorizationService basicAuthorizationService, ApiKeyAuthorizationService apiKeyAuthorizationService) {
+    public RestTemplateServiceImpl(RequestsRepository requestsRepository, ResponsesRepository responsesRepository, ResponsesService responsesService, RequestsService requestsService, FormsService formsService,BasicAuthorizationService basicAuthorizationService,ApiKeyAuthorizationService apiKeyAuthorizationService) {
         this.requestsRepository = requestsRepository;
         this.responsesService = responsesService;
         this.requestsService = requestsService;
@@ -130,7 +131,7 @@ public class RestTemplateServiceImpl implements RestTemplateService {
     }
 
     private HttpHeaders setHeaders(String requestHeader){
-        HttpHeaders headers=  HttpHeaders.readOnlyHttpHeaders(setJsonObject(requestHeader));
+        HttpHeaders headers=  HttpHeaders.readOnlyHttpHeaders((HttpHeaders) setJsonObject(requestHeader));
         System.out.println(headers);
         return headers;
     }
