@@ -32,6 +32,7 @@ public class ResponsesServiceImpl implements ResponsesService{
         Long requestId = responsesEntity.getRequestEntity().getRequestId();
         Requests requestEntity = requestRepository.findById(requestId).get();
         responsesEntity.setRequestEntity(requestEntity);
+        System.out.println(responsesEntity);
         return responsesRepository.save(responsesEntity);
 //        responsesEntity.setRequestedAt(Instant.now());
     }
@@ -45,4 +46,6 @@ public class ResponsesServiceImpl implements ResponsesService{
     public List<ResponsesEntity> findResponsesById(long id) {
         return responsesRepository.findResponsesById(id);
     }
+
+
 }

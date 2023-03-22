@@ -1,15 +1,12 @@
 package com.jsonbook.Json.Book.entity;
 
-
 import org.hibernate.annotations.Type;
 import org.springframework.web.bind.annotation.RequestMethod;
-import sun.security.krb5.internal.crypto.EType;
-
 import javax.persistence.*;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Map;
-
+import com.jsonbook.Json.Book.AuthorizationType;
+import com.jsonbook.Json.Book.RequestBodyType;
 @Entity
 @Table(name="requests")
 public class Requests {
@@ -29,7 +26,6 @@ public class Requests {
     @Type(type = "org.hibernate.type.TextType")
     @Column(name = "request_url",nullable = false)
     private String url;
-
     /*@Column(name = "request_header")
     @Type(type = "org.hibernate.type.PostgresHstoreType")
     private Map<String,String> requestHeader;*/
@@ -37,12 +33,9 @@ public class Requests {
     @Lob
     @Type(type = "org.hibernate.type.TextType")
     private String requestHeader;;
-
-
     /*@Column(name = "request_param")
     @Type(type = "org.hibernate.type.PostgresHstoreType")
     private Map<String,String> requestParam;*/
-
     @Column(name = "request_param")
     @Lob
     @Type(type = "org.hibernate.type.TextType")
@@ -50,7 +43,7 @@ public class Requests {
 
     @Enumerated(EnumType.STRING)
     @Column(name="request_authentication_type")
-    private AuthenticationType authenticationType;
+    private AuthorizationType authenticationType;
 
     @Lob
     @Type(type = "org.hibernate.type.TextType")
@@ -78,6 +71,16 @@ public class Requests {
 
     @OneToMany(mappedBy = "requests", cascade = CascadeType.ALL)
     private List<ResponsesEntity> responsesEntities;
+    @OneToMany(mappedBy = "requests", cascade = CascadeType.ALL)
+    private List<Forms> forms;
+    @OneToOne(mappedBy = "requests", cascade = CascadeType.ALL)
+    private BasicAuthorization basicAuthorizations;
+
+    @OneToOne(mappedBy = "requests", cascade = CascadeType.ALL)
+    private ApiKeyAuthorization apiKeyAuthorizations;
+
+    @OneToOne(mappedBy = "requests", cascade = CascadeType.ALL)
+    private JwtBearer jwtBearers;
 
     public Requests(){}
 
@@ -105,7 +108,7 @@ public class Requests {
         this.requestParam = requestParam;
     }
 
-    public void setAuthenticationType(AuthenticationType authenticationType) {
+    public void setAuthenticationType(AuthorizationType authenticationType) {
         this.authenticationType = authenticationType;
     }
 
@@ -157,7 +160,7 @@ public class Requests {
         return requestParam;
     }
 
-    public AuthenticationType getAuthenticationType() {
+    public AuthorizationType getAuthenticationType() {
         return authenticationType;
     }
 
@@ -185,7 +188,7 @@ public class Requests {
         return groups;
     }
 
-    public Requests(long requestId, String requestName, RequestMethod requestMethod, String url, String requestHeader, String requestParam, AuthenticationType authenticationType, String requestBearerToken, RequestBodyType requestBodyType, String requestBodyRaw, ZonedDateTime createdAt, ZonedDateTime updatedAt, Groups groups) {
+    public Requests(long requestId, String requestName, RequestMethod requestMethod, String url, String requestHeader, String requestParam, AuthorizationType authenticationType, String requestBearerToken, RequestBodyType requestBodyType, String requestBodyRaw, ZonedDateTime createdAt, ZonedDateTime updatedAt, Groups groups) {
         this.requestId = requestId;
         this.requestName = requestName;
         this.requestMethod = requestMethod;
@@ -199,27 +202,5 @@ public class Requests {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.groups = groups;
-    }
-}
-enum AuthenticationType{
-    NO_AUTH("No Auth"),
-    API_KEY("API Key"),
-    BEARER_TOKEN("Bearer Token"),
-    JWT_BEARER("JWT Bearer"),
-    BASIC_AUTH("Basic Auth");
-    public final String label;
-    private AuthenticationType(String label){
-        this.label=label;
-    }
-}
-enum RequestBodyType{
-    NONE("none"),
-    RAW("raw"),
-    FORM_DATA("form-data"),
-    FORM_ENCODED("x-www-form-urlencoded"),
-    BASIC_AUTH("Basic Auth");
-    public final String label;
-    private RequestBodyType(String label){
-        this.label=label;
     }
 }

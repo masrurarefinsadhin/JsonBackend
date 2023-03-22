@@ -1,31 +1,34 @@
 package com.jsonbook.Json.Book.service.implementation;
 
-import com.jsonbook.Json.Book.entity.Requests;
-import com.jsonbook.Json.Book.entity.ResponsesEntity;
+import com.jsonbook.Json.Book.AuthorizationType;
+import com.jsonbook.Json.Book.HeaderParamType;
+import com.jsonbook.Json.Book.RequestBodyType;
+import com.jsonbook.Json.Book.entity.*;
 import com.jsonbook.Json.Book.repository.RequestsRepository;
 import com.jsonbook.Json.Book.repository.ResponsesRepository;
-import com.jsonbook.Json.Book.service.RequestsService;
-import com.jsonbook.Json.Book.service.ResponsesService;
-import com.jsonbook.Json.Book.service.RestTemplateService;
+import com.jsonbook.Json.Book.service.*;
 import org.json.JSONObject;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 
 @Service
 public class RestTemplateServiceImpl implements RestTemplateService {
     private final RequestsRepository requestsRepository;
     private final ResponsesService responsesService;
     private final RequestsService requestsService;
-    public RestTemplateServiceImpl(RequestsRepository requestsRepository, ResponsesRepository responsesRepository, ResponsesService responsesService, RequestsService requestsService) {
+    private  final FormsService formsService;
+    private final BasicAuthorizationService basicAuthorizationService;
+    private final ApiKeyAuthorizationService apiKeyAuthorizationService;
+    public RestTemplateServiceImpl(RequestsRepository requestsRepository, ResponsesRepository responsesRepository, ResponsesService responsesService, RequestsService requestsService, FormsService formsService, BasicAuthorizationService basicAuthorizationService, ApiKeyAuthorizationService apiKeyAuthorizationService) {
         this.requestsRepository = requestsRepository;
         this.responsesService = responsesService;
         this.requestsService = requestsService;
@@ -36,13 +39,38 @@ public class RestTemplateServiceImpl implements RestTemplateService {
     public String getResponse(long id) {
         try {
             Requests requests= requestsService.findRequests(id);
-            long requestId = requests.getRequestId();
             RequestMethod requestMethod= requests.getRequestMethod();
+            AuthorizationType authorizationType= requests.getAuthenticationType();
+            HttpHeaders headers= setHeaders(requests.getRequestHeader());
+            URI uri = setParameters(requests.getRequestParam(),requests.getUrl());
+            if (authorizationType != AuthorizationType.NO_AUTH) {
+                //headers=setAuthorization(requests,headers,authorizationType);
+                switch (authorizationType){
+                    case BASIC_AUTH:
+                        BasicAuthorization basicAuthorization= basicAuthorizationService.findBasicAuthorization(requests);
+                        headers.setBasicAuth(basicAuthorization.getBasicUsername(),basicAuthorization.getBasicPassword());
+                    case BEARER_TOKEN:
+                        String token= requests.getRequestBearerToken();
+                        if(token!= null ){headers.setBearerAuth(token);}
+                    case API_KEY:
+                        ApiKeyAuthorization apiKeyAuthorization= apiKeyAuthorizationService.findApiKeyAuthorization(requests);
+                        HeaderParamType headerParamType= apiKeyAuthorization.getHeaderParamType();
+                        switch (headerParamType){
+                            case HEADER:
+                                headers.set(apiKeyAuthorization.getApiKey(),apiKeyAuthorization.getApiValue());
+                            case PARAM:
+                                UriComponentsBuilder builder = UriComponentsBuilder.fromUri(uri)
+                                        .queryParam(apiKeyAuthorization.getApiKey(), apiKeyAuthorization.getApiValue());
+                                uri=URI.create(builder.toUriString());
+                        }
+                }
+            }
+
             switch (requestMethod){
-                case GET: return getMethod(requests);
-                case POST: return "";
-                case DELETE: return deleteMethod(requestId, requests);
-                case PUT: return "";
+                case GET: return returnResponse(uri,HttpMethod.GET,new HttpEntity<>( headers),requests);
+                case POST: return postMethod(requests,headers,uri,HttpMethod.POST);
+                case PUT: return postMethod(requests,headers,uri,HttpMethod.PUT);
+                case DELETE: return returnResponse(uri,HttpMethod.DELETE,new HttpEntity<>(headers),requests);
             }
         }
         catch (Exception e){return e.toString();}
@@ -64,61 +92,85 @@ public class RestTemplateServiceImpl implements RestTemplateService {
         //System.out.println(headers);
         //headers.setContentType(MediaType.APPLICATION_JSON);
 
-        //String requestHeader="{\"Accept\":\"application/json,text/plain,*/*\",\"Accept-Encoding\":\"deflate\",\"Accept-Language\":\"en-US,en;q=0.9\",\"Connection\":\"keep-alive\"}";
-        String requestHeader=requests.getRequestHeader();
-        if(requestHeader != null){
-            JSONObject jsonObjectHeader = new JSONObject(requestHeader);
-            for(String key: jsonObjectHeader.keySet()){
-                //System.out.println(key);
-                //System.out.println(jsonObjectHeader.get(key));
-                headers.set(key, (String) jsonObjectHeader.get(key));
-                //System.out.println(headers);
-            }
+    private HttpHeaders setAuthorization(Requests requests, HttpHeaders headers, AuthorizationType authorizationType) {
+        switch (authorizationType){
+            case BASIC_AUTH:
+                BasicAuthorization basicAuthorization= basicAuthorizationService.findBasicAuthorization(requests);
+                headers.setBasicAuth(basicAuthorization.getBasicUsername(),basicAuthorization.getBasicPassword());
+            case BEARER_TOKEN:
+                String token= requests.getRequestBearerToken();
+                if(token!= null ){headers.setBearerAuth(token);}
+            case API_KEY:
+                ApiKeyAuthorization apiKeyAuthorization= apiKeyAuthorizationService.findApiKeyAuthorization(requests);
+                headers.set(apiKeyAuthorization.getApiKey(),apiKeyAuthorization.getApiValue());
         }
-        //headers.set("Host", "<calculated when request is sent>");
-        //headers.set("Accept", "application/json");
-        //headers.set("Accept-Encoding", "gzip");
-        //System.out.println(headers);
+        return headers;
+    }
 
-        //System.out.println(entity);
-        //String requestParam="{\"limit\":\"10\"}";
-        //String requestParam="{\"limit\":\"10\", \"select\":\"key1,key2,key3\"}";
-        String requestParam= requests.getRequestParam();
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<String, String>();
-        if (requestParam!=null){
-            JSONObject jsonObjectParam = new JSONObject(requestParam);
-            for(String key: jsonObjectParam.keySet()){
-                System.out.println(key);
-                System.out.println(jsonObjectParam.get(key));
-                params.set(key, (String) jsonObjectParam.get(key));
-            }
-            System.out.println(params);
+    private String getMethod(Requests requests, HttpHeaders headers, URI uri){
+        HttpEntity<String> entity = new HttpEntity<>( headers);
+        return returnResponse(uri,HttpMethod.GET,entity,requests);
+    }
+
+    private String postMethod(Requests requests, HttpHeaders headers,URI uri,HttpMethod httpMethod){
+        RequestBodyType requestBodyType=requests.getRequestBodyType();
+        String requestBodyRaw=requests.getRequestBodyRaw();
+        Object entity=null;
+        if (requestBodyType == RequestBodyType.RAW && requestBodyRaw!=null) {
+            entity = new HttpEntity<>(requestBodyRaw, headers);
         }
-        //MultiValueMap<String, String> myParams = new LinkedMultiValueMap<String, String>();
-        //myParams.add("status", "inprogress");
-        //myParams.add("status", "completed");
+        else if (requestBodyType==RequestBodyType.FORM_ENCODED || requestBodyType==RequestBodyType.FORM_DATA) {
+            if (requestBodyType==RequestBodyType.FORM_ENCODED){headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);}
+            List<Forms> forms= formsService.findFormsByRequestId(requests.getRequestId(),requestBodyType);
+            MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+            for (Forms obj : forms) {formData.add(obj.getFormKey(),obj.getFormValue());}
+            entity = new HttpEntity<>(formData, headers);
+        }
+        return returnResponse(uri,httpMethod,entity,requests);
+    }
 
+    private HttpHeaders setHeaders(String requestHeader){
+        HttpHeaders headers=  HttpHeaders.readOnlyHttpHeaders(setJsonObject(requestHeader));
+        System.out.println(headers);
+        return headers;
+    }
+
+    private URI setParameters(String requestParam, String url){
+
+        MultiValueMap<String, String> params = setJsonObject(requestParam);
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url)
                 .queryParams(params);
-        URI uri = URI.create(builder.toUriString());
-        System.out.println(uri);
+        return URI.create(builder.toUriString());
+    }
 
-        //ResponseEntity<String> response= restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
-        HttpEntity<String> entity = new HttpEntity<>( headers);
+    private MultiValueMap< String, String> setJsonObject(String value){
+        MultiValueMap<String, String> list = new LinkedMultiValueMap<>();
+        if (value!=null){
+            JSONObject jsonObjectParam = new JSONObject(value);
+            for(String key: jsonObjectParam.keySet()){
+                list.set(key, (String) jsonObjectParam.get(key));
+            }
+        }
+        return list;
+    }
+
+    private String deleteMethod( Requests requests, HttpHeaders headers,URI uri){
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        return returnResponse(uri,HttpMethod.DELETE,entity,requests);
+
+
+    }
+
+    private String returnResponse(URI uri , HttpMethod httpMethod, Object entity ,Requests requests){
+        RestTemplate restTemplate=  new RestTemplate();
         Instant requestedAt= Instant.now();
-        ResponseEntity<String> s=restTemplate.exchange(uri, HttpMethod.GET, entity, String.class);
+        ResponseEntity<String> response=restTemplate.exchange(uri, httpMethod, (HttpEntity<?>)entity, String.class);
         Instant respondedAt = Instant.now();
         System.out.println(requestedAt);
         System.out.println(respondedAt);
         long timeInMils = Duration.between(requestedAt, respondedAt).toMillis();
-        System.out.println(timeInMils);
-        System.out.println(s.getBody());
-        System.out.println(s.getHeaders());
-        System.out.println(s.getClass());
-        String responseStatus= s.getStatusCode().toString();
-        System.out.println(responseStatus);
-        System.out.println(s.getStatusCode());
-        String responseBody=s.getBody();
+        String responseStatus= response.getStatusCode().toString();
+        String responseBody=response.getBody();
         responsesService.saveResponses(new ResponsesEntity( null,responseStatus, responseBody,requestedAt,respondedAt,timeInMils,requests));
         return s.getBody();
     }
