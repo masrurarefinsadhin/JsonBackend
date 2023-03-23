@@ -71,6 +71,7 @@ public class GroupsController {
 
     @DeleteMapping("/delete/{group_id}")
     public void deleteGroups(@PathVariable("group_id") long id) {
+        groupsService.deleteGroupRefrence(id);
         groupsService.deleteGroups(id);
     }
 }

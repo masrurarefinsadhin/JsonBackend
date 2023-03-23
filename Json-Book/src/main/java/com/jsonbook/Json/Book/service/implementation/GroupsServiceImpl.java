@@ -34,5 +34,9 @@ public class GroupsServiceImpl implements GroupsService {
     public Groups updateGroups(Groups groups) {
         return groupsRepository.save(groups);
     }
+
+    public void deleteGroupRefrence(long id){
+        groupsRepository.deleteGroupRefrence(id);
+    }
 }
 

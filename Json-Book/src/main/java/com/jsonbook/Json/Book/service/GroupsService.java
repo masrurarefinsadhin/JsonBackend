@@ -10,6 +10,7 @@ public interface GroupsService {
     Groups addGroups(Groups groups);
     void deleteGroups(long id);
     Groups updateGroups(Groups groups);
+    void deleteGroupRefrence(long id);
 
 }
 
