@@ -158,7 +158,7 @@ public class RestTemplateServiceImpl implements RestTemplateService {
         String responseStatus= response.getStatusCode().toString();
         String responseBody=response.getBody();
         responsesService.saveResponses(new ResponsesEntity( null,responseStatus, responseBody,requestedAt,respondedAt,timeInMils,requests));
-        return responseBody+responseStatus;
+        return responseBody;
     }
 
 }
