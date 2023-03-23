@@ -1,6 +1,7 @@
 package com.jsonbook.Json.Book.controller;
 
 import com.jsonbook.Json.Book.entity.Groups;
+import com.jsonbook.Json.Book.entity.Requests;
 import com.jsonbook.Json.Book.entity.User;
 import com.jsonbook.Json.Book.exception.ResourceNotFoundException;
 import com.jsonbook.Json.Book.repository.GroupsRepository;
@@ -38,11 +39,16 @@ public class GroupsController {
 
     @GetMapping("/{id}")
     public List<Groups> findAllGroupsByUser(@PathVariable("id") long id) {
-        /*return userRepository.findById(id).get().getGroupAccess()
+        return userRepository.findById(id).get().getGroupAccess()
                 .stream()
                 .map(group -> new Groups(group.getGroupId(), group.getGroupName(), null, null))
-                .collect(Collectors.toList());*/
-        return userRepository.findById(id).get().getGroupAccess();
+                .collect(Collectors.toList());
+        //return userRepository.findById(id).get().getGroupAccess();
+    }
+    @GetMapping("/requests/{id}")
+    public List<Requests> findAllRequestByUser(@PathVariable("id")long id){
+        return userRepository.findById(id).get().getGroupAccess()
+                .stream().flatMap(group->group.getRequests().stream()).collect(Collectors.toList());
     }
 
     @PostMapping("/{id}")
