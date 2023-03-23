@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.jsonbook.Json.Book.repository.UserRepository;
 import com.jsonbook.Json.Book.entity.User;
 
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins ={ "http://localhost:4200"})
 @RestController
 @RequestMapping("/api/v2/")
 public class UserController {

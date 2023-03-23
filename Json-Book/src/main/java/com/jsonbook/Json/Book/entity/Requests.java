@@ -12,7 +12,7 @@ import com.jsonbook.Json.Book.AuthorizationType;
 import com.jsonbook.Json.Book.RequestBodyType;
 @Entity
 @Table(name="requests")
-public class Requests {
+public class Requests implements Comparable<Requests>{
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "request_id")
@@ -208,4 +208,27 @@ public class Requests {
         this.updatedAt = updatedAt;
         this.groups = groups;
     }
+    @Override
+    public int compareTo(Requests other) {
+        String thisName = this.requestName.toLowerCase();
+        String otherName = other.getRequestName().toLowerCase();
+        int similarity = getSimilarity(thisName, otherName);
+        return Integer.compare(similarity, 0);
+    }
+
+    private int getSimilarity(String str1, String str2) {
+        int maxLength = Math.max(str1.length(), str2.length());
+        int distance = maxLength;
+        if (maxLength > 0) {
+            distance -= Math.abs(str1.length() - str2.length());
+            for (int i = 0; i < Math.min(str1.length(), str2.length()); i++) {
+                if (str1.charAt(i) == str2.charAt(i)) {
+                    distance++;
+                }
+            }
+        }
+        return distance;
+    }
+
+
 }

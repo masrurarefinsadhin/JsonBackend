@@ -1,5 +1,6 @@
 package com.jsonbook.Json.Book.repository;
 
+import com.jsonbook.Json.Book.entity.Groups;
 import com.jsonbook.Json.Book.entity.Requests;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,4 +13,6 @@ import java.util.List;
 public interface RequestsRepository extends JpaRepository<Requests, Long> {
     @Query(value = "SELECT * FROM requests WHERE group_id = :groupId", nativeQuery = true)
     List<Requests> findRequestById(@Param("groupId") Long groupId);
+
+    //List<Requests> findRequestsByGroups(List<Groups>groups);
 }

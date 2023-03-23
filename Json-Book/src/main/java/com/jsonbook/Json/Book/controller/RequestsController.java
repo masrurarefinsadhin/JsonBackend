@@ -59,7 +59,6 @@ public class RequestsController {
     @GetMapping("create-response/{requestId}")
     public String createResponse(@PathVariable("requestId")Long requestId){
         return restTemplateService.getResponse(requestId);
-
     }
 
 }
