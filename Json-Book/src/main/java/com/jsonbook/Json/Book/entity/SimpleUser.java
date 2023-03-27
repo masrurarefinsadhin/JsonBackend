@@ -1,4 +1,4 @@
-package com.jsonbook.Json.Book.controller;
+package com.jsonbook.Json.Book.entity;
 
 public class SimpleUser {
     private long id;
