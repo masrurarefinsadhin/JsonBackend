@@ -57,7 +57,7 @@ public class GroupsController {
     }
 
     @PostMapping("/{id}")
-    Groups addGroups(@RequestBody Groups groups, @PathVariable("id") long id) {
+    public Groups addGroups(@RequestBody Groups groups, @PathVariable("id") long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("user not found with id " + id));
         Groups groups1 = groupsService.addGroups(groups);
         /*List<Groups> groupSet= user.getGroupAccess().stream().map(group -> new Groups(group.getGroupId(), group.getGroupName(),null,null))
@@ -67,6 +67,15 @@ public class GroupsController {
         user.setGroupAccess(groupSet);
         userRepository.save(user);
         return groups1;
+    }
+    @GetMapping("/{group_id}/add-new-user/{id}")
+    public void addGroupNewUser(@PathVariable("group_id") long groupId,@PathVariable("id") long id){
+        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("user not found with id " + id));
+        Groups group= groupsRepository.findById(groupId).orElseThrow(() -> new ResourceNotFoundException("user not found with id " + id));
+        List<Groups> groupSet = user.getGroupAccess();
+        groupSet.add(group);
+        user.setGroupAccess(groupSet);
+        userRepository.save(user);
     }
 
     @PutMapping
