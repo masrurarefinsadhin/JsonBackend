@@ -3,6 +3,7 @@ package com.jsonbook.Json.Book.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 import com.jsonbook.Json.Book.service.UserRequest;
@@ -90,4 +91,9 @@ public class UserController {
         return userRepository.findAll();
     }
 
+    @GetMapping("/list-of-users")
+    public List<SimpleUser> getAllListOfUsers(){
+        return userRepository.findAll().stream().map(user -> new SimpleUser(user.getId(), user.getFirstName()))
+                .collect(Collectors.toList());
+    }
 }
