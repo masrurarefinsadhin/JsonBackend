@@ -4,6 +4,8 @@ import javax.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.jsonbook.Json.Book.RequestBodyType;
+import com.jsonbook.Json.Book.RoleType;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import java.util.ArrayList;
@@ -17,10 +19,14 @@ import java.util.Set;
 public class User {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private long id;
 
-    @Column(name="email")
+    /*@Enumerated(EnumType.STRING)
+    @Column(name="role_type")
+    private RoleType roleType=RoleType.USER;*/
+
+    @Column(name="email",unique = true)
     private String email;
 
     @Column(name="password")
@@ -47,13 +53,13 @@ public class User {
     @JsonIdentityReference(alwaysAsId = true)
     List<Groups> groupAccess= new ArrayList<>() ;
 
-//	@Column(name="isActive")
-//	private boolean isActive;
-
-    public User() {
-
+    public long getId() {
+        return id;
     }
 
+    public String getEmail() {
+        return email;
+    }
 
     public void setId(long id) {
         this.id = id;
@@ -91,25 +97,10 @@ public class User {
         this.groupAccess = groupAccess;
     }
 
-    public User(long id, String email, String password, String firstName, String middleName, String lastName, String mobile, String address, List<Groups> groupAccess) {
-        this.id = id;
-        this.email = email;
-        this.password = password;
-        this.firstName = firstName;
-        this.middleName = middleName;
-        this.lastName = lastName;
-        this.mobile = mobile;
-        this.address = address;
-        this.groupAccess = groupAccess;
+    public void setRoleAccess(List<Roles> roleAccess) {
+        this.roleAccess = roleAccess;
     }
 
-    public long getId() {
-        return id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
 
     public String getPassword() {
         return password;
@@ -137,5 +128,35 @@ public class User {
 
     public List<Groups> getGroupAccess() {
         return groupAccess;
+    }
+
+    public List<Roles> getRoleAccess() {
+        return roleAccess;
+    }
+    public List<Roles> getRoleAccessMod() {
+        return roleAccess;
+    }
+
+    @ManyToMany
+    @JoinTable(name="role_access", joinColumns = @JoinColumn(name = "id"), inverseJoinColumns=@JoinColumn(name="role_id") )
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "roleType")
+    @JsonIdentityReference(alwaysAsId = true)
+    List<Roles> roleAccess= new ArrayList<>();
+
+
+    public User() {
+    }
+
+    public User(long id, String email, String password, String firstName, String middleName, String lastName, String mobile, String address, List<Groups> groupAccess, List<Roles> roleAccess) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.firstName = firstName;
+        this.middleName = middleName;
+        this.lastName = lastName;
+        this.mobile = mobile;
+        this.address = address;
+        this.groupAccess = groupAccess;
+        this.roleAccess = roleAccess;
     }
 }

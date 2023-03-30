@@ -6,8 +6,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 
-import com.jsonbook.Json.Book.entity.SimpleUser;
+import com.jsonbook.Json.Book.entity.CustomUserDetails;
+import com.jsonbook.Json.Book.entity.Roles;
 import com.jsonbook.Json.Book.service.UserRequest;
+import com.jsonbook.Json.Book.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,9 +26,12 @@ public class UserController {
 
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     PasswordEncoder encoder;
+    @Autowired
+    JwtUtil jwtUtil;
+
+
 
     @PostMapping("register")
     public ResponseEntity<?> register(@RequestBody User user) {
@@ -60,8 +65,8 @@ public class UserController {
         if (userRepository.existsByEmail(userRequest.getEmail()) && use != null) {
             if (encoder.matches(userRequest.getPassword(), use.getPassword())) {
 
-                String jwt = use.getEmail() + "+token";
-
+                //String jwt = use.getEmail() + "+token";
+                final String jwt = jwtUtil.generateToken(new CustomUserDetails(use));
                 response.put("accessToken", jwt);
                 response.put("email", use.getEmail());
                 response.put("id",use.getId());
@@ -86,6 +91,10 @@ public class UserController {
     public List<User> getAllUsers(){
         return userRepository.findAll();
     }
+    @GetMapping("/user-role/{id}")
+    public List<Roles> getUserRole(@PathVariable("id") Long id){
+        return userRepository.findById(id).get().getRoleAccess();
+    }
 
     @GetMapping("/list-of-users")
     public Map<Long,String> getAllListOfUsers(){
@@ -98,5 +107,9 @@ public class UserController {
     @GetMapping("/user-delete/{id}")
     public void userDeleteById(@PathVariable("id") Long id){
         userRepository.deleteById(id);
+    }
+    @GetMapping("/user-email")
+    public User findByEmail(@RequestBody String s){
+        return userRepository.findByEmail(s);
     }
 }
