@@ -8,11 +8,13 @@ import com.jsonbook.Json.Book.repository.GroupsRepository;
 import com.jsonbook.Json.Book.repository.RequestsRepository;
 import com.jsonbook.Json.Book.repository.UserRepository;
 import com.jsonbook.Json.Book.service.GroupsService;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @CrossOrigin(origins = {"http://localhost:4200", "http://localhost:35549"})
@@ -38,6 +40,12 @@ public class GroupsController {
                 .map(group -> new Groups(group.getGroupId(), group.getGroupName(),null,null))
                 .collect(Collectors.toList());*/
         return groupsService.findAllGroups();
+    }
+
+    @GetMapping("/id/{id}")
+    public Groups findGroups(@PathVariable("id") long id){
+        return groupsService.findGroups(id);
+
     }
 
     @GetMapping("/{id}")

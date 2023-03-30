@@ -1,6 +1,7 @@
 package com.jsonbook.Json.Book.service.implementation;
 
 import com.jsonbook.Json.Book.entity.Groups;
+import com.jsonbook.Json.Book.entity.Requests;
 import com.jsonbook.Json.Book.repository.GroupsRepository;
 import com.jsonbook.Json.Book.service.GroupsService;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,11 @@ public class GroupsServiceImpl implements GroupsService {
     @Override
     public void deleteGroups(long id) {
         groupsRepository.deleteById(id);
+    }
+
+    @Override
+    public Groups findGroups(long id) {
+        return groupsRepository.findById(id).get();
     }
 
     @Override
