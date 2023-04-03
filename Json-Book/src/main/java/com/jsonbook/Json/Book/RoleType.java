@@ -6,4 +6,12 @@ public enum RoleType {
     ADMIN,
     USER,
     ANONYMOUS;
+
+    public static RoleType fromString(String role) {
+        try {
+            return RoleType.valueOf(role);
+        } catch (Exception e) {
+            return ANONYMOUS;
+        }
+    }
 }
