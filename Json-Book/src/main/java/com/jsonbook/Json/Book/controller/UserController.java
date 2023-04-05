@@ -18,6 +18,9 @@ import org.springframework.web.bind.annotation.*;
 
 import com.jsonbook.Json.Book.repository.UserRepository;
 import com.jsonbook.Json.Book.entity.User;
+import org.springframework.web.servlet.ModelAndView;
+
+import javax.swing.text.html.HTML;
 
 @CrossOrigin(origins ={ "http://localhost:4200"})
 @RestController
@@ -52,6 +55,10 @@ public class UserController {
         }
 
         return new ResponseEntity<>(response, status);
+    }
+    @GetMapping("login-test")
+    public ModelAndView loginTest(){
+        return new ModelAndView("login");
     }
 
     @PostMapping("login")

@@ -36,6 +36,13 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         if (authorizationHeader != null) {
             jwt = authorizationHeader;
+            if (jwtUtil.isTokenExpired(jwt)) {
+                //give the request 401 error
+                response.setContentType("text/html");
+                response.setStatus(HttpServletResponse. SC_UNAUTHORIZED);
+                System.out.print(response.getStatus());
+                return;
+            }
             username = jwtUtil.extractUsername(jwt);
         }
 
@@ -51,13 +58,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 usernamePasswordAuthenticationToken
                         .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-            }
-            else {
-                //give the request 401 error
-                response.setContentType("text/html");
-                response.setStatus(HttpServletResponse. SC_UNAUTHORIZED);
-                System.out.print(response.getStatus());
-                return;
             }
         }
         chain.doFilter(request, response);
