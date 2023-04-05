@@ -5,6 +5,8 @@ import com.jsonbook.Json.Book.entity.Roles;
 import com.jsonbook.Json.Book.entity.User;
 import com.jsonbook.Json.Book.repository.UserRepository;
 import com.jsonbook.Json.Book.service.RolesService;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
