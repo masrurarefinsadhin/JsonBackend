@@ -3,6 +3,7 @@ package com.jsonbook.Json.Book.filter;
 
 import com.jsonbook.Json.Book.service.implementation.CustomUserDetailsService;
 import com.jsonbook.Json.Book.util.JwtUtil;
+import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,17 +35,28 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String username = null;
         String jwt = null;
 
-        if (authorizationHeader != null) {
-            jwt = authorizationHeader;
-            if (jwtUtil.isTokenExpired(jwt)) {
-                //give the request 401 error
-                response.setContentType("text/html");
-                response.setStatus(HttpServletResponse. SC_UNAUTHORIZED);
-                System.out.print(response.getStatus());
-                return;
+        try {
+            if (authorizationHeader != null && !authorizationHeader.isEmpty()) {
+                jwt = authorizationHeader;
+                System.out.print("Coming here");
+                username = jwtUtil.extractUsername(jwt);
             }
-            username = jwtUtil.extractUsername(jwt);
+        }catch (ExpiredJwtException e){
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
         }
+
+//        if (authorizationHeader != null) {
+//            jwt = authorizationHeader;
+//            if (jwtUtil.isTokenExpired(jwt)) {
+//                //give the request 401 error
+//                response.setContentType("text/html");
+//                response.setStatus(HttpServletResponse. SC_UNAUTHORIZED);
+//                System.out.print(response.getStatus());
+//                return;
+//            }
+//            username = jwtUtil.extractUsername(jwt);
+//        }
 
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
