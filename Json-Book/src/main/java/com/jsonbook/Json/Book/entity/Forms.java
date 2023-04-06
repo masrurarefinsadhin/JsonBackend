@@ -1,5 +1,8 @@
 package com.jsonbook.Json.Book.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.jsonbook.Json.Book.FormType;
 import com.jsonbook.Json.Book.RequestBodyType;
 
@@ -25,6 +28,8 @@ public class Forms {
 
     @ManyToOne
     @JoinColumn(name="request_id",nullable = false)
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "requestId")
+    @JsonIdentityReference(alwaysAsId = true)
     private Requests requests;
 
     public Forms(){

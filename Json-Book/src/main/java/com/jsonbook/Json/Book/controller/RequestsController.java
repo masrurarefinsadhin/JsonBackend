@@ -1,6 +1,8 @@
 package com.jsonbook.Json.Book.controller;
 
+import com.jsonbook.Json.Book.RequestBodyType;
 import com.jsonbook.Json.Book.entity.RequestFormDto;
+import com.jsonbook.Json.Book.entity.RequestUpdateDto;
 import com.jsonbook.Json.Book.entity.Requests;
 import com.jsonbook.Json.Book.service.FormsService;
 import com.jsonbook.Json.Book.service.RequestsService;
@@ -55,6 +57,17 @@ public class RequestsController {
         return requestsService.findRequests(requestId);
         //return restTemplateService.getResponse(requestId);
         //return "hello"+requestId.toString();
+    }
+    @GetMapping("/{requestId}/forms")
+    public RequestUpdateDto findFormsByRequestId(@PathVariable("requestId") Long requestId){
+        Requests requests = requestsService.findRequests(requestId);
+        RequestUpdateDto requestUpdateDto = new RequestUpdateDto();
+        requestUpdateDto.setRequests(requests);
+        if (requests.getRequestMethod()==RequestMethod.POST){
+            if (requests.getRequestBodyType()== RequestBodyType.FORM_DATA){
+                requestUpdateDto.addObject(formsService.findFormsByRequestId(requestId,RequestBodyType.FORM_DATA));}}
+        System.out.println(requestUpdateDto);
+        return requestUpdateDto;
     }
     @GetMapping("create-response/{requestId}")
     public String createResponse(@PathVariable("requestId")Long requestId){

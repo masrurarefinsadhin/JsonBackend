@@ -37,8 +37,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .cors().and().csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/api/v2/login","/api/v2/register","/api/v2/login-test").permitAll()
-                .antMatchers("roles/assign-role/*/*","/create-new-role","/groups/*/add-new-user/*","/roles/show-roles").hasAuthority("ADMIN")
-                .antMatchers("/**").hasAnyAuthority("ADMIN","USER")
+                .antMatchers("roles/assign-role/*/*","/create-new-role","/groups/*/add-new-user/*","/roles/show-roles").permitAll()
+                .antMatchers("/**").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and().
